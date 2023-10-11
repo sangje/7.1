@@ -163,6 +163,9 @@ class ECAPA_TDNN(nn.Module):
         self.fc6 = nn.Linear(3072, 192)
         self.bn6 = nn.BatchNorm1d(192)
 
+        # Add layers to binay classification
+        self.fc7 = nn.Linear(192, 1)
+        self.sig = nn.Sigmoid()
 
     def forward(self, x, aug):
         with torch.no_grad():
@@ -196,5 +199,8 @@ class ECAPA_TDNN(nn.Module):
         x = self.bn5(x)
         x = self.fc6(x)
         x = self.bn6(x)
+
+        x = self.bn7(x)
+        x = self.sig(x)
 
         return x

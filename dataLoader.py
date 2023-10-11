@@ -23,13 +23,13 @@ class train_loader(object):
 		# Load data & labels
 		self.data_list  = []
 		self.data_label = []
-		lines = open(train_list).read().splitlines()
-		dictkeys = list(set([x.split()[0] for x in lines]))
-		dictkeys.sort()
-		dictkeys = { key : ii for ii, key in enumerate(dictkeys) }
+		lines = open(train_list).read().splitlines()[1:] # Header line 제외
+		# dictkeys = list(set([x.split()[0] for x in lines]))
+		# dictkeys.sort()
+		# dictkeys = { key : ii for ii, key in enumerate(dictkeys) }
 		for index, line in enumerate(lines):
-			speaker_label = dictkeys[line.split()[0]]
-			file_name     = os.path.join(train_path, line.split()[1])
+			speaker_label = int(line.split()[2]) # This is PHQ Binary {0,1}
+			file_name     = os.path.join(train_path, line.split()[0]+'_AUDIO.wav') # Convert 301 > ~301_AUDIO.wav
 			self.data_label.append(speaker_label)
 			self.data_list.append(file_name)
 
@@ -89,3 +89,34 @@ class train_loader(object):
 			noises.append(numpy.sqrt(10 ** ((clean_db - noise_db - noisesnr) / 10)) * noiseaudio)
 		noise = numpy.sum(numpy.concatenate(noises,axis=0),axis=0,keepdims=True)
 		return noise + audio
+	
+class validate_loader(object):
+	def __init__(self, validate_list, validate_path, num_frames, **kwargs):
+		self.train_path = validate_path
+		self.num_frames = num_frames
+
+		# Load data & labels
+		self.data_list  = []
+		self.data_label = []
+		lines = open(validate_list).read().splitlines()[1:] # Header line 제외
+
+		for index, line in enumerate(lines):
+			speaker_label = int(line.split()[2]) # This is PHQ Binary {0,1}
+			file_name     = os.path.join(validate_path, line.split()[0]+'_AUDIO.wav') # Convert 301 > ~301_AUDIO.wav
+			self.data_label.append(speaker_label)
+			self.data_list.append(file_name)
+
+	def __getitem__(self, index):
+		# Read the utterance and randomly select the segment
+		audio, sr = soundfile.read(self.data_list[index])		
+		length = self.num_frames * 160 + 240
+		if audio.shape[0] <= length:
+			shortage = length - audio.shape[0]
+			audio = numpy.pad(audio, (0, shortage), 'wrap')
+		start_frame = numpy.int64(random.random()*(audio.shape[0]-length))
+		audio = audio[start_frame:start_frame + length]
+		audio = numpy.stack([audio],axis=0)
+		return torch.FloatTensor(audio[0]), self.data_label[index]
+
+	def __len__(self):
+		return len(self.data_list)

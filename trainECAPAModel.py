@@ -4,34 +4,33 @@ This is the main code of the ECAPATDNN project, to define the parameters and bui
 
 import argparse, glob, os, torch, warnings, time
 from tools import *
-from dataLoader import train_loader
+from dataLoader import train_loader, validate_loader
 from ECAPAModel import ECAPAModel
 
 parser = argparse.ArgumentParser(description = "ECAPA_trainer")
 ## Training Settings
 parser.add_argument('--num_frames', type=int,   default=200,     help='Duration of the input segments, eg: 200 for 2 second')
 parser.add_argument('--max_epoch',  type=int,   default=80,      help='Maximum number of epochs')
-parser.add_argument('--batch_size', type=int,   default=400,     help='Batch size')
+parser.add_argument('--batch_size', type=int,   default=16,     help='Batch size')
 parser.add_argument('--n_cpu',      type=int,   default=4,       help='Number of loader threads')
 parser.add_argument('--test_step',  type=int,   default=1,       help='Test and save every [test_step] epochs')
 parser.add_argument('--lr',         type=float, default=0.001,   help='Learning rate')
 parser.add_argument("--lr_decay",   type=float, default=0.97,    help='Learning rate decay every [test_step] epochs')
 
 ## Training and evaluation path/lists, save path
-parser.add_argument('--train_list', type=str,   default="/data08/VoxCeleb2/train_list.txt",     help='The path of the training list, https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/train_list.txt')
-parser.add_argument('--train_path', type=str,   default="/data08/VoxCeleb2/train/wav",                    help='The path of the training data, eg:"/data08/VoxCeleb2/train/wav" in my case')
-parser.add_argument('--eval_list',  type=str,   default="/data08/VoxCeleb1/veri_test2.txt",              help='The path of the evaluation list, veri_test2.txt comes from https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/veri_test2.txt')
-parser.add_argument('--eval_path',  type=str,   default="/data08/VoxCeleb1/test/wav",                    help='The path of the evaluation data, eg:"/data08/VoxCeleb1/test/wav" in my case')
-parser.add_argument('--musan_path', type=str,   default="/data08/Others/musan_split",                    help='The path to the MUSAN set, eg:"/data08/Others/musan_split" in my case')
-parser.add_argument('--rir_path',   type=str,   default="/data08/Others/RIRS_NOISES/simulated_rirs",     help='The path to the RIR set, eg:"/data08/Others/RIRS_NOISES/simulated_rirs" in my case');
+parser.add_argument('--train_list', type=str,   default="~/sevenpointone/DAIC-WOZ/labels/train_split.txt",     help='The path of the training list, https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/train_list.txt')
+parser.add_argument('--train_path', type=str,   default="~/sevenpointone/DAIC-WOZ/audio_files/train_split",                    help='The path of the training data, eg:"/data08/VoxCeleb2/train/wav" in my case')
+parser.add_argument('--validate_list',  type=str,   default="~/sevenpointone/DAIC-WOZ/labels/dev_split.txt",              help='The path of the validation list')
+parser.add_argument('--validate_path',  type=str,   default="~/sevenpointone/DAIC-WOZ/audio_files/val_split",                    help='The path of the Validation data, eg:"/data08/VoxCeleb1/test/wav" in my case')
+parser.add_argument('--test_list',  type=str,   default="~/sevenpointone/DAIC-WOZ/labels/test_split.txt",              help='The path of the test list')
+parser.add_argument('--test_path',  type=str,   default="~/sevenpointone/DAIC-WOZ/audio_files/test_split",                    help='The path of the test data, eg:"/data08/VoxCeleb1/test/wav" in my case')
+parser.add_argument('--musan_path', type=str,   default="~/SJ/DATA/musan",                    help='The path to the MUSAN set, eg:"/data08/Others/musan_split" in my case')
+parser.add_argument('--rir_path',   type=str,   default="~/sevenpointone/RIRS_NOISES/simulated_rirs",     help='The path to the RIR set, eg:"/data08/Others/RIRS_NOISES/simulated_rirs" in my case');
 parser.add_argument('--save_path',  type=str,   default="exps/exp1",                                     help='Path to save the score.txt and models')
 parser.add_argument('--initial_model',  type=str,   default="",                                          help='Path of the initial_model')
 
 ## Model and Loss settings
 parser.add_argument('--C',       type=int,   default=1024,   help='Channel size for the speaker encoder')
-parser.add_argument('--m',       type=float, default=0.2,    help='Loss margin in AAM softmax')
-parser.add_argument('--s',       type=float, default=30,     help='Loss scale in AAM softmax')
-parser.add_argument('--n_class', type=int,   default=5994,   help='Number of speakers')
 
 ## Command
 parser.add_argument('--eval',    dest='eval', action='store_true', help='Only do evaluation')
@@ -44,7 +43,9 @@ args = init_args(args)
 
 ## Define the data loader
 trainloader = train_loader(**vars(args))
+validateloader = validate_loader(**vars(args))
 trainLoader = torch.utils.data.DataLoader(trainloader, batch_size = args.batch_size, shuffle = True, num_workers = args.n_cpu, drop_last = True)
+validateLoader = torch.utils.data.DataLoader(validateloader, batch_size = args.batch_size, shuffle = True, num_workers = args.n_cpu, drop_last = True)
 
 ## Search for the exist models
 modelfiles = glob.glob('%s/model_0*.model'%args.model_save_path)
@@ -77,19 +78,23 @@ else:
 	epoch = 1
 	s = ECAPAModel(**vars(args))
 
-EERs = []
+F1score = []
+Acc = []
 score_file = open(args.score_save_path, "a+")
 
 while(1):
 	## Training for one epoch
-	loss, lr, acc = s.train_network(epoch = epoch, loader = trainLoader)
+	train_loss, lr = s.train_network(epoch = epoch, loader = trainLoader)
+	validate_loss = s.validate_network(loader = validateLoader)
 
 	## Evaluation every [test_step] epochs
 	if epoch % args.test_step == 0:
 		s.save_parameters(args.model_save_path + "/model_%04d.model"%epoch)
-		EERs.append(s.eval_network(eval_list = args.eval_list, eval_path = args.eval_path)[0])
-		print(time.strftime("%Y-%m-%d %H:%M:%S"), "%d epoch, ACC %2.2f%%, EER %2.2f%%, bestEER %2.2f%%"%(epoch, acc, EERs[-1], min(EERs)))
-		score_file.write("%d epoch, LR %f, LOSS %f, ACC %2.2f%%, EER %2.2f%%, bestEER %2.2f%%\n"%(epoch, lr, loss, acc, EERs[-1], min(EERs)))
+		f1, acc = s.test_network(eval_list = args.test_list, eval_path = args.test_path)
+		F1score.append(f1)
+		Acc.append(acc)
+		print(time.strftime("%Y-%m-%d %H:%M:%S"), "%d epoch, ACC %2.2f%%, F1score %2.2f%%"%(epoch, Acc[-1], F1score[-1]))
+		score_file.write("%d epoch, LR %f, Train_LOSS %f, Validate_LOSS %f, ACC %2.2f%%, F1score %2.2f%%\n"%(epoch, lr, train_loss, validate_loss, Acc[-1], F1score[-1]))
 		score_file.flush()
 
 	if epoch >= args.max_epoch:
