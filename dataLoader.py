@@ -88,7 +88,8 @@ class train_loader(object):
 			noise_db = 10 * numpy.log10(numpy.mean(noiseaudio ** 2)+1e-4) 
 			noisesnr   = random.uniform(self.noisesnr[noisecat][0],self.noisesnr[noisecat][1])
 			noises.append(numpy.sqrt(10 ** ((clean_db - noise_db - noisesnr) / 10)) * noiseaudio)
-		noise = numpy.sum(numpy.concatenate(noises,axis=0),axis=0,keepdims=True)
+		#noise = numpy.sum(numpy.concatenate(noises,axis=0),axis=0,keepdims=True)
+		noise = numpy.concatenate(noises, axis=0)
 		return noise + audio
 	
 class validate_loader(object):
