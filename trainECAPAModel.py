@@ -18,14 +18,14 @@ parser.add_argument('--lr',         type=float, default=0.001,   help='Learning 
 parser.add_argument("--lr_decay",   type=float, default=0.97,    help='Learning rate decay every [test_step] epochs')
 
 ## Training and evaluation path/lists, save path
-parser.add_argument('--train_list', type=str,   default="~/sevenpointone/DAIC-WOZ/labels/train_split.txt",     help='The path of the training list, https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/train_list.txt')
-parser.add_argument('--train_path', type=str,   default="~/sevenpointone/DAIC-WOZ/audio_files/train_split",                    help='The path of the training data, eg:"/data08/VoxCeleb2/train/wav" in my case')
-parser.add_argument('--validate_list',  type=str,   default="~/sevenpointone/DAIC-WOZ/labels/dev_split.txt",              help='The path of the validation list')
-parser.add_argument('--validate_path',  type=str,   default="~/sevenpointone/DAIC-WOZ/audio_files/val_split",                    help='The path of the Validation data, eg:"/data08/VoxCeleb1/test/wav" in my case')
-parser.add_argument('--test_list',  type=str,   default="~/sevenpointone/DAIC-WOZ/labels/test_split.txt",              help='The path of the test list')
-parser.add_argument('--test_path',  type=str,   default="~/sevenpointone/DAIC-WOZ/audio_files/test_split",                    help='The path of the test data, eg:"/data08/VoxCeleb1/test/wav" in my case')
-parser.add_argument('--musan_path', type=str,   default="~/SJ/DATA/musan",                    help='The path to the MUSAN set, eg:"/data08/Others/musan_split" in my case')
-parser.add_argument('--rir_path',   type=str,   default="~/sevenpointone/RIRS_NOISES/simulated_rirs",     help='The path to the RIR set, eg:"/data08/Others/RIRS_NOISES/simulated_rirs" in my case');
+parser.add_argument('--train_list', type=str,   default="/home/user/sevenpointone/DAIC-WOZ/labels/train_split.txt",     help='The path of the training list, https://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/train_list.txt')
+parser.add_argument('--train_path', type=str,   default="/home/user/sevenpointone/DAIC-WOZ/audio_files/train_split",                    help='The path of the training data, eg:"/data08/VoxCeleb2/train/wav" in my case')
+parser.add_argument('--validate_list',  type=str,   default="/home/user/sevenpointone/DAIC-WOZ/labels/dev_split.txt",              help='The path of the validation list')
+parser.add_argument('--validate_path',  type=str,   default="/home/user/sevenpointone/DAIC-WOZ/audio_files/val_split",                    help='The path of the Validation data, eg:"/data08/VoxCeleb1/test/wav" in my case')
+parser.add_argument('--test_list',  type=str,   default="/home/user/sevenpointone/DAIC-WOZ/labels/test_split.txt",              help='The path of the test list')
+parser.add_argument('--test_path',  type=str,   default="/home/user/sevenpointone/DAIC-WOZ/audio_files/test_split",                    help='The path of the test data, eg:"/data08/VoxCeleb1/test/wav" in my case')
+parser.add_argument('--musan_path', type=str,   default="/home/user/SJ/DATA/musan",                    help='The path to the MUSAN set, eg:"/data08/Others/musan_split" in my case')
+parser.add_argument('--rir_path',   type=str,   default="/home/user/sevenpointone/RIRS_NOISES/simulated_rirs",     help='The path to the RIR set, eg:"/data08/Others/RIRS_NOISES/simulated_rirs" in my case');
 parser.add_argument('--save_path',  type=str,   default="exps/exp1",                                     help='Path to save the score.txt and models')
 parser.add_argument('--initial_model',  type=str,   default="",                                          help='Path of the initial_model')
 
