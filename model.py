@@ -200,7 +200,7 @@ class ECAPA_TDNN(nn.Module):
         x = self.fc6(x)
         x = self.bn6(x)
 
-        x = self.bn7(x)
+        x = self.fc7(x)
         x = self.sig(x)
 
         return x
