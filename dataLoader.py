@@ -19,7 +19,7 @@ class train_loader(object):
 			if file.split('/')[-3] not in self.noiselist:
 				self.noiselist[file.split('/')[-3]] = []
 			self.noiselist[file.split('/')[-3]].append(file)
-		print(self.noiselist)
+		
 		self.rir_files  = glob.glob(os.path.join(rir_path,'*/*/*.wav'))
 		# Load data & labels
 		self.data_list  = []
