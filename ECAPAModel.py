@@ -27,9 +27,9 @@ class ECAPAModel(nn.Module):
 		lr = self.optim.param_groups[0]['lr']
 		for num, (data, labels) in enumerate(loader, start = 1):
 			self.zero_grad()
-			labels            = torch.FloatTensor(labels).cuda()
+			labels            = torch.LongTensor(labels).cuda()
 			logits = self.model.forward(data.cuda(), aug = True).squeeze()
-			nloss = self.loss(logits, labels)			
+			nloss = self.loss(logits, labels.to(dtype=torch.float))			
 			nloss.backward()
 			self.optim.step()
 			#index += len(labels)
@@ -46,9 +46,9 @@ class ECAPAModel(nn.Module):
 		## Update the learning rate based on the current epcoh
 		loss = 0
 		for num, (data, labels) in enumerate(loader, start = 1):
-			labels            = torch.FloatTensor(labels).cuda()
+			labels            = torch.LongTensor(labels).cuda()
 			logits = self.model.forward(data.cuda(), aug = False).squeeze()
-			nloss = self.loss(logits, labels)			
+			nloss = self.loss(logits, labels.to(dtype=torch.float))			
 			loss += nloss.detach().cpu().numpy()
 			sys.stderr.write(" Validate_Loss: %.5f"        %(loss/(num)))
 			sys.stderr.flush()
