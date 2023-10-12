@@ -83,6 +83,8 @@ F1score = []
 Acc = []
 score_file = open(args.score_save_path, "a+")
 
+# Score file log parameters
+score_file.write("Num_frames %d, Batch %d, Channel_size %d, Threshold %2.2f\n"%(args.num_frames, args.batch_size, args.C, args.threshold))
 while(1):
 	## Training for one epoch
 	train_loss, lr = s.train_network(epoch = epoch, loader = trainLoader)
