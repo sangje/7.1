@@ -69,6 +69,7 @@ class train_loader(object):
 		rir, sr     = soundfile.read(rir_file)
 		rir         = numpy.expand_dims(rir.astype(numpy.float),0)
 		rir         = rir / numpy.sqrt(numpy.sum(rir**2))
+		print(rir.shape,audio.shape)
 		return signal.convolve(audio, rir, mode='full')[:,:self.num_frames * 160 + 240]
 
 	def add_noise(self, audio, noisecat):
