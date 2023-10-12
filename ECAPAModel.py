@@ -67,6 +67,7 @@ class ECAPAModel(nn.Module):
 			file_name     = os.path.join(test_path, line.split()[0]+'_AUDIO.wav') # Convert 301 > ~301_AUDIO.wav
 			data_label.append(speaker_label)
 			data_list.append(file_name)
+		print(data_list)
 		for i, data in enumerate(data_list):
 			audio, sr = soundfile.read(self.data_list[i])
 			if len(audio.shape) == 2 and audio.shape[1] > 1:
