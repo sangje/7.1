@@ -91,9 +91,6 @@ class ECAPAModel(nn.Module):
 		threshold = 0.5
 		predicted_labels = [1 if prob >= threshold else 0 for prob in prediction]
 
-		true_labels = data_label.cpu().numpy()
-		predicted_labels = predicted_labels.cpu().numpy()
-
 		# Calculate and print the accuracy
 		acc = (true_labels == predicted_labels).mean()
 
