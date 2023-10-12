@@ -72,7 +72,8 @@ class ECAPAModel(nn.Module):
 			audio, sr = soundfile.read(data_list[i])
 			if len(audio.shape) == 2 and audio.shape[1] > 1:
 				audio = audio[:, 0]  # Extract the left channel
-			prediction.append(self.model(audio, aug=False).item())
+			audio=torch.FloatTensor(audio[0])
+			prediction.append(self.model(audio.cuda(), aug=False).item())
 		
 		# Choose a threshold (e.g., 0.5) to convert probabilities to binary predictions
 		threshold = 0.5
