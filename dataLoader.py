@@ -37,7 +37,8 @@ class train_loader(object):
 	def __getitem__(self, index):
 		# Read the utterance and randomly select the segment
 		audio, sr = soundfile.read(self.data_list[index])
-		audio = audio[:,0]
+		if audio.shape[1] > 1:
+			audio = audio[:, 0]  # Extract the left channel
 		print("Audio Shape:",audio.shape)		
 		length = self.num_frames * 160 + 240
 		if audio.shape[0] <= length:
