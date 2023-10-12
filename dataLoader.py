@@ -39,7 +39,6 @@ class train_loader(object):
 		audio, sr = soundfile.read(self.data_list[index])
 		if len(audio.shape) == 2 and audio.shape[1] > 1:
 			audio = audio[:, 0]  # Extract the left channel
-		print("Audio Shape:",audio.shape)		
 		length = self.num_frames * 160 + 240
 		if audio.shape[0] <= length:
 			shortage = length - audio.shape[0]
@@ -72,7 +71,6 @@ class train_loader(object):
 		rir, sr     = soundfile.read(rir_file)
 		rir         = numpy.expand_dims(rir.astype(numpy.float),0)
 		rir         = rir / numpy.sqrt(numpy.sum(rir**2))
-		print(rir.shape,audio.shape)
 		return signal.convolve(audio, rir, mode='full')[:,:self.num_frames * 160 + 240]
 
 	def add_noise(self, audio, noisecat):
