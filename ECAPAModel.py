@@ -8,16 +8,18 @@ from tools import *
 from model import ECAPA_TDNN
 
 class ECAPAModel(nn.Module):
-	def __init__(self, lr, lr_decay, C , test_step, **kwargs):
+	def __init__(self, lr, lr_decay, C , test_step, num_frames, **kwargs):
 		super(ECAPAModel, self).__init__()
 		## ECAPA-TDNN
 		self.model = ECAPA_TDNN(C = C).cuda()
 		## Classifier
 		self.loss	 = nn.BCELoss()
-
 		self.optim           = torch.optim.Adam(self.parameters(), lr = lr, weight_decay = 2e-5)
 		self.scheduler       = torch.optim.lr_scheduler.StepLR(self.optim, step_size = test_step, gamma=lr_decay)
 		print(time.strftime("%m-%d %H:%M:%S") + " Model para number = %.2f"%(sum(param.numel() for param in self.model.parameters()) / 1024 / 1024))
+		self.num_frames = num_frames
+
+		
 
 	def train_network(self, epoch, loader):
 		self.train()
@@ -81,6 +83,7 @@ class ECAPAModel(nn.Module):
 			audio = audio[start_frame:start_frame + length]
 			audio = numpy.stack([audio],axis=0)
 			audio = torch.FloatTensor(audio[0])
+			audio = audio.unsqueeze() # For Batch=1
 
 			prediction.append(self.model(audio.cuda(), aug=False).item())
 		
