@@ -78,7 +78,7 @@ class ECAPAModel(nn.Module):
 			length = self.num_frames * 160 + 240
 			if audio.shape[0] <= length:
 				shortage = length - audio.shape[0]
-			audio = numpy.pad(audio, (0, shortage), 'wrap')
+				audio = numpy.pad(audio, (0, shortage), 'wrap')
 			start_frame = numpy.int64(random.random()*(audio.shape[0]-length))
 			audio = audio[start_frame:start_frame + length]
 			audio = numpy.stack([audio],axis=0)
