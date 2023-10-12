@@ -92,6 +92,8 @@ class ECAPAModel(nn.Module):
 		predicted_labels = [1 if prob >= threshold else 0 for prob in prediction]
 		true_labels = data_label
 		# Calculate and print the accuracy
+		print(true_labels)
+		print(predicted_labels)
 		acc = (true_labels == predicted_labels).mean()
 
 		# Calculate and print the F1 score
