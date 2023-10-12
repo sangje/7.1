@@ -83,7 +83,7 @@ class ECAPAModel(nn.Module):
 			audio = audio[start_frame:start_frame + length]
 			audio = numpy.stack([audio],axis=0)
 			audio = torch.FloatTensor(audio[0])
-			audio = audio.unsqueeze() # For Batch=1
+			audio = audio.unsqueeze(0) # For Batch=1
 
 			prediction.append(self.model(audio.cuda(), aug=False).item())
 		
