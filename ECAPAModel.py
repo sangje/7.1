@@ -90,7 +90,7 @@ class ECAPAModel(nn.Module):
 		# Choose a threshold (e.g., 0.5) to convert probabilities to binary predictions
 		threshold = 0.5
 		predicted_labels = [1 if prob >= threshold else 0 for prob in prediction]
-
+		true_labels = data_label
 		# Calculate and print the accuracy
 		acc = (true_labels == predicted_labels).mean()
 
