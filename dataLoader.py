@@ -36,7 +36,8 @@ class train_loader(object):
 
 	def __getitem__(self, index):
 		# Read the utterance and randomly select the segment
-		audio, sr = soundfile.read(self.data_list[index])		
+		audio, sr = soundfile.read(self.data_list[index])
+		print("Audio Shape:",audio.shape)		
 		length = self.num_frames * 160 + 240
 		if audio.shape[0] <= length:
 			shortage = length - audio.shape[0]
