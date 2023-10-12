@@ -18,7 +18,7 @@ class ECAPAModel(nn.Module):
 		self.scheduler       = torch.optim.lr_scheduler.StepLR(self.optim, step_size = test_step, gamma=lr_decay)
 		print(time.strftime("%m-%d %H:%M:%S") + " Model para number = %.2f"%(sum(param.numel() for param in self.model.parameters()) / 1024 / 1024))
 		self.num_frames = num_frames
-		self.treshold = threshold
+		self.threshold = threshold
 
 		
 
