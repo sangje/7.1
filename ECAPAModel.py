@@ -69,6 +69,8 @@ class ECAPAModel(nn.Module):
 			data_list.append(file_name)
 		for i, data in enumerate(data_list):
 			audio, sr = soundfile.read(self.data_list[i])
+			if len(audio.shape) == 2 and audio.shape[1] > 1:
+				audio = audio[:, 0]  # Extract the left channel
 			prediction.append(self.model(audio).item())
 		
 		# Choose a threshold (e.g., 0.5) to convert probabilities to binary predictions
