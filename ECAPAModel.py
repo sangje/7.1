@@ -2,7 +2,7 @@
 This part is used to train the speaker model and evaluate the performances
 '''
 
-import torch, sys, os, tqdm, numpy, soundfile, time, pickle
+import torch, sys, os, tqdm, numpy, soundfile, time, pickle, random
 import torch.nn as nn
 from tools import *
 from model import ECAPA_TDNN
@@ -70,9 +70,18 @@ class ECAPAModel(nn.Module):
 		
 		for i, data in enumerate(data_list):
 			audio, sr = soundfile.read(data_list[i])
+
 			if len(audio.shape) == 2 and audio.shape[1] > 1:
 				audio = audio[:, 0]  # Extract the left channel
-			audio=torch.FloatTensor(audio)
+			length = self.num_frames * 160 + 240
+			if audio.shape[0] <= length:
+				shortage = length - audio.shape[0]
+			audio = numpy.pad(audio, (0, shortage), 'wrap')
+			start_frame = numpy.int64(random.random()*(audio.shape[0]-length))
+			audio = audio[start_frame:start_frame + length]
+			audio = numpy.stack([audio],axis=0)
+			audio = torch.FloatTensor(audio[0])
+
 			prediction.append(self.model(audio.cuda(), aug=False).item())
 		
 		# Choose a threshold (e.g., 0.5) to convert probabilities to binary predictions
