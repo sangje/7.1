@@ -90,7 +90,7 @@ while(1):
 	## Evaluation every [test_step] epochs
 	if epoch % args.test_step == 0:
 		s.save_parameters(args.model_save_path + "/model_%04d.model"%epoch)
-		f1, acc = s.test_network(eval_list = args.test_list, eval_path = args.test_path)
+		f1, acc = s.test_network(test_list = args.test_list, test_path = args.test_path)
 		F1score.append(f1)
 		Acc.append(acc)
 		print(time.strftime("%Y-%m-%d %H:%M:%S"), "%d epoch, ACC %2.2f%%, F1score %2.2f%%"%(epoch, Acc[-1], F1score[-1]))
