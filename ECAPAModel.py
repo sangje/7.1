@@ -8,7 +8,7 @@ from tools import *
 from model import ECAPA_TDNN
 
 class ECAPAModel(nn.Module):
-	def __init__(self, lr, lr_decay, C , test_step, num_frames, **kwargs):
+	def __init__(self, lr, lr_decay, C , test_step, num_frames, threshold, **kwargs):
 		super(ECAPAModel, self).__init__()
 		## ECAPA-TDNN
 		self.model = ECAPA_TDNN(C = C).cuda()
@@ -18,6 +18,7 @@ class ECAPAModel(nn.Module):
 		self.scheduler       = torch.optim.lr_scheduler.StepLR(self.optim, step_size = test_step, gamma=lr_decay)
 		print(time.strftime("%m-%d %H:%M:%S") + " Model para number = %.2f"%(sum(param.numel() for param in self.model.parameters()) / 1024 / 1024))
 		self.num_frames = num_frames
+		self.treshold = threshold
 
 		
 
@@ -88,9 +89,9 @@ class ECAPAModel(nn.Module):
 			prediction.append(self.model(audio.cuda(), aug=False).item())
 		
 		# Choose a threshold (e.g., 0.5) to convert probabilities to binary predictions
-		threshold = 0.5
-		predicted_labels = numpy.array([1 if prob >= threshold else 0 for prob in prediction])
+		predicted_labels = numpy.array([1 if prob >= self.threshold else 0 for prob in prediction])
 		true_labels = numpy.array(data_label)
+		print(predicted_labels)
 		# Calculate and print the accuracy
 		acc = (true_labels == predicted_labels).mean()
 

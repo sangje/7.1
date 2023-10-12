@@ -31,6 +31,7 @@ parser.add_argument('--initial_model',  type=str,   default="",                 
 
 ## Model and Loss settings
 parser.add_argument('--C',       type=int,   default=1024,   help='Channel size for the speaker encoder')
+parser.add_argument('--threshold',       type=float,   default=0.5,   help='Threshold for prediction')
 
 ## Command
 parser.add_argument('--eval',    dest='eval', action='store_true', help='Only do evaluation')
